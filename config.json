@@ -1,0 +1,21 @@
+{
+    "ForkedFrom": "Firt trial actually",
+    "Dataset": "ModelNet10",
+    "latent_code_leg": 1, 
+    "resolution": 100,
+    "cube_size" : 50,
+    "DeepSDFModel": "../model/model_2samples_modelnet10_codelen=1.params",
+    "featureScaler": "../model/features_scaler_2samples_modelnet10_codelen=1.save",
+    "device": "cpu",
+    "dataset_path": "../dataset/",
+    "epochs" : 20,
+    "batch_size":100,
+    "learning_rate" : 0.002,
+    "desc": {   "general":"To see the capabilities of DeepSDF for shape interpolation when 2 shapes from modelnet10 are used...",
+    		"before":"",
+    		"current":"",
+    		"future":"maybe more latent codes"
+    	      
+              }
+}
+
