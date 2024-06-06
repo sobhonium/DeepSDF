@@ -55,8 +55,8 @@ code_len = setting["latent_code_leg"]
 lr = setting["learning_rate"]
 # batchsize
 batch_size = setting["batch_size"]
-
-
+# epochs
+epochs = setting["epochs"]
 
 
 
@@ -177,7 +177,8 @@ test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, 
 
 from model.deepSDFmodel import DeepSDFModel4
 
-code_len = 1
+
+
 model = DeepSDFModel4(
               feature_len = 3,       # cordinate_dim=3 ihtout coef=3, 
               code_len=code_len,
@@ -207,7 +208,7 @@ valid_err = []
 
 #  Training Loop
 
-epochs = setting["epochs"]
+
 
 print(f'Training started on {device}...')
 model.train()    
