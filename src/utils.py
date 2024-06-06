@@ -1,4 +1,3 @@
-from scipy.ndimage import binary_fill_holes, binary_closing
 import trimesh
 from scipy.ndimage import distance_transform_edt
 import numpy as np
@@ -25,12 +24,22 @@ def cube_voxel(indices, cube_size):
     
     
 def save_xyz(voxel_grid, filename=None, sdf_mode='neg'):
-    '''given a voxel_grid of size n*m*q it saves values with 'sdf_mode' values'''
+    '''Given a voxel_grid of size n*m*q, it saves 
+       the point cloud of points with specified sdf_mode condition
+
+        voxel_grid: an n*m*q grid sdf voxel that is needed to be saved for
+                    plot as a point cloud.
+        filename  :  The destination where the pointcloud is saved
+
+        sdf_mode  : Since the given voxel_grid is a floating-point grid,
+                    it's expected that some filteration is needed to extract
+                    points. By default, it selects the sdf<0.  
+    '''
     
     
-    if sdf_mode==["neg", "n", "negative", -1, "-", "-1"]:
+    if   sdf_mode==["neg", "n", "negative", -1, "-", "-1", "<0", None]:
     	indices = np.argwhere(voxel_grid <= 0)
-    elif sdf_mode==["pos", "p", "positive", +1, "+", "1", "+1"]:
+    elif sdf_mode==["pos", "p", "positive", +1, "+",  "1", "+1", ">0"]:
     	indices = np.argwhere(voxel_grid > 0)
     else:
      	indices = np.argwhere(voxel_grid <= 0)
@@ -38,7 +47,7 @@ def save_xyz(voxel_grid, filename=None, sdf_mode='neg'):
     if (filename==None):
         filename = 'output.xyz'
     
-    # Open the file in write mode
+    
     with open(filename, 'w') as file:
         # Write each point to the file
         for point in indices:
@@ -46,15 +55,25 @@ def save_xyz(voxel_grid, filename=None, sdf_mode='neg'):
     print(f'{filename} is saved...')
     
     
-def mesh_to_cubid_sdf(file_name,resolution=32, cube_size=50):
+def mesh_to_cubid_sdf(file_name, resolution=32, cube_size=50):
+    '''
+    Converts a given file_mesh into sdf gird in a cube of size  n*n*n (where n=cube_size).
+
+    file_name : is the file_name (addr) of a mesh file (usually .off files are used)
+    resolution: from mesh to voxel what resolution do you want to be used? the finer 
+                shape needs higher resolution.
+    '''
+    
     mesh = trimesh.load(file_name)
     
     # Convert the mesh to a voxel grid
     voxel_data = mesh.voxelized(pitch=mesh.extents.max() / resolution, method='subdivide')#.matrix
     voxel_data = voxel_data.matrix.astype(int)
-    # +
     
-    occupancy_cube_vox = np.zeros((cube_size, cube_size, cube_size), dtype=np.int8) # 0 or 1 in n*n*n 3d matrix
+
+    # 0 or 1 in n*n*n 3d matrix
+    occupancy_cube_vox = np.zeros((cube_size, cube_size, cube_size), dtype=np.int8) 
+    # 0,1 are the voxel's values in binary. I say 0.5 since I'm sure 0 and 1 are convered...
     indices = np.argwhere(voxel_data > 0.5) 
 
 
@@ -65,12 +84,14 @@ def mesh_to_cubid_sdf(file_name,resolution=32, cube_size=50):
     voxel_data = occupancy_cube_vox
     
     
-    
+    # transforming binary grid to floating point grid
+    # based on the distance (it's an SDF transformation).
     voxel1_ =  distance_transform_edt(voxel_data) 
     voxel2_ =  distance_transform_edt((voxel_data+1)%2)
     
-    # sdf_voxel1 = voxel1_ #- voxel2_
-    # sdf_voxel = voxel2_
-    sdf_voxel = -voxel1_ + voxel2_
+    # Do you want the positive, negative or both values?
+    # sdf_voxel1 = voxel1_ # only one channel
+    # sdf_voxel = voxel2_  # only the opposite channel one
+    sdf_voxel = -voxel1_ + voxel2_  # both
 
     return sdf_voxel          

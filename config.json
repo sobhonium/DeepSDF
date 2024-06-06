@@ -8,7 +8,7 @@
     "featureScaler": "../model/features_scaler_2samples_modelnet10_codelen=1.save",
     "device": "cpu",
     "dataset_path": "../dataset/",
-    "epochs" : 20,
+    "epochs" : 150,
     "batch_size":100,
     "learning_rate" : 0.002,
     "desc": {   "general":"To see the capabilities of DeepSDF for shape interpolation when 2 shapes from modelnet10 are used...",
